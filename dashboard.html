@@ -2,119 +2,113 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - IAA Pulse</title>
-    
-    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            background-color: #f0f2f5;
+        }
+        .sos-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 1000;
+            font-size: 30px;
+        }
+        .card-hover {
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+        }
+    </style>
 </head>
 <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav class="navbar navbar-dark bg-primary">
         <div class="container">
-            <a class="navbar-brand" href="#">
+            <span class="navbar-brand">
                 <i class="fas fa-broadcast-tower"></i> IAA Pulse
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" id="navProfile">
-                            <i class="fas fa-user-circle"></i> <span id="userName">Loading...</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <button class="btn btn-outline-light ms-2" id="logoutBtn">
-                            <i class="fas fa-sign-out-alt"></i> Logout
-                        </button>
-                    </li>
-                </ul>
+            </span>
+            <div>
+                <span id="userEmailDisplay" class="text-white me-3"></span>
+                <button id="logoutBtn" class="btn btn-outline-light btn-sm">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
             </div>
         </div>
     </nav>
 
-    <!-- Main Content -->
     <div class="container mt-4">
-        <!-- Welcome Section -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="alert alert-success">
-                    <i class="fas fa-check-circle"></i> Welcome to IAA Pulse!
-                    <span id="roleBadge" class="badge bg-info float-end">Student</span>
-                </div>
-            </div>
+        <div class="alert alert-success" id="welcomeAlert">
+            Welcome to IAA Pulse!
         </div>
 
-        <!-- Student Dashboard -->
-        <div id="studentDashboard" class="dashboard-section">
-            <div class="row">
-                <div class="col-md-6 col-lg-3 mb-3">
-                    <div class="card text-center card-hover">
-                        <div class="card-body">
-                            <i class="fas fa-bullhorn fa-3x text-primary mb-2"></i>
-                            <h5 class="card-title">Announcements</h5>
-                            <p class="card-text">View official campus announcements</p>
-                            <a href="pages/student/announcements.html" class="btn btn-primary btn-sm">View</a>
-                        </div>
+        <div class="row mt-4">
+            <div class="col-md-6 col-lg-3 mb-3">
+                <div class="card text-center card-hover" onclick="window.location.href='pages/student/announcements.html'">
+                    <div class="card-body">
+                        <i class="fas fa-bullhorn fa-3x text-primary mb-2"></i>
+                        <h5>Announcements</h5>
+                        <p class="text-muted small">View official announcements</p>
                     </div>
                 </div>
-                <div class="col-md-6 col-lg-3 mb-3">
-                    <div class="card text-center card-hover">
-                        <div class="card-body">
-                            <i class="fas fa-search fa-3x text-warning mb-2"></i>
-                            <h5 class="card-title">Lost & Found</h5>
-                            <p class="card-text">Report lost items or browse found items</p>
-                            <a href="pages/student/lost_found.html" class="btn btn-warning btn-sm">Browse</a>
-                        </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3 mb-3">
+                <div class="card text-center card-hover" onclick="alert('Lost & Found coming soon')">
+                    <div class="card-body">
+                        <i class="fas fa-search fa-3x text-warning mb-2"></i>
+                        <h5>Lost & Found</h5>
+                        <p class="text-muted small">Report lost or found items</p>
                     </div>
                 </div>
-                <div class="col-md-6 col-lg-3 mb-3">
-                    <div class="card text-center card-hover">
-                        <div class="card-body">
-                            <i class="fas fa-exclamation-triangle fa-3x text-danger mb-2"></i>
-                            <h5 class="card-title">SOS Emergency</h5>
-                            <p class="card-text">Send alert to campus security</p>
-                            <button class="btn btn-danger btn-sm" id="sosBtn">Trigger SOS</button>
-                        </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3 mb-3">
+                <div class="card text-center card-hover" id="sosCard">
+                    <div class="card-body">
+                        <i class="fas fa-exclamation-triangle fa-3x text-danger mb-2"></i>
+                        <h5>SOS Emergency</h5>
+                        <p class="text-muted small">Alert campus security</p>
                     </div>
                 </div>
-                <div class="col-md-6 col-lg-3 mb-3">
-                    <div class="card text-center card-hover">
-                        <div class="card-body">
-                            <i class="fas fa-inbox fa-3x text-success mb-2"></i>
-                            <h5 class="card-title">Anonymous Box</h5>
-                            <p class="card-text">Report issues anonymously</p>
-                            <a href="pages/student/anonymous.html" class="btn btn-success btn-sm">Submit</a>
-                        </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3 mb-3">
+                <div class="card text-center card-hover" onclick="alert('Anonymous Box coming soon')">
+                    <div class="card-body">
+                        <i class="fas fa-inbox fa-3x text-success mb-2"></i>
+                        <h5>Anonymous Box</h5>
+                        <p class="text-muted small">Report anonymously</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Floating SOS Button -->
     <button class="sos-button" id="floatingSosBtn">
         <i class="fas fa-exclamation-triangle"></i>
     </button>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Firebase SDKs -->
     <script type="module">
+        // ALL IMPORTS IN ONE BLOCK
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
         import { getAuth, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
         import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
         
-        // Your Firebase Configuration (REPLACE WITH YOUR ACTUAL CONFIG)
+        // REPLACE WITH YOUR FIREBASE CONFIG
         const firebaseConfig = {
             apiKey: "YOUR_API_KEY",
             authDomain: "YOUR_AUTH_DOMAIN",
@@ -129,50 +123,58 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         
-        // FIXED: Check authentication state with persistence
+        // Check auth state ONCE when page loads
+        let authChecked = false;
+        
         onAuthStateChanged(auth, async (user) => {
-            console.log("Auth state changed. User:", user);
+            console.log("Auth state changed. User:", user ? user.email : "null");
             
             if (!user) {
-                console.log("No user found - redirecting to login");
+                // No user - redirect to login
+                console.log("No user, redirecting to login");
                 window.location.href = 'index.html';
                 return;
             }
             
-            console.log("User is logged in:", user.email);
+            // User is logged in - show dashboard
+            console.log("User logged in:", user.email);
+            document.getElementById('userEmailDisplay').innerText = user.email;
+            document.getElementById('welcomeAlert').innerHTML = `Welcome ${user.email}! You are logged in to IAA Pulse.`;
             
+            // Try to get user name from Firestore (optional)
             try {
-                // Get user role from Firestore
                 const userDoc = await getDoc(doc(db, 'users', user.uid));
-                const userData = userDoc.data();
-                const role = userData?.role || 'student';
-                
-                // Display user name
-                document.getElementById('userName').textContent = userData?.name || user.email;
-                document.getElementById('roleBadge').textContent = role.toUpperCase();
-                
-                console.log("User role:", role);
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    if (userData.name) {
+                        document.getElementById('welcomeAlert').innerHTML = `Welcome ${userData.name}! You are logged in to IAA Pulse.`;
+                        document.getElementById('userEmailDisplay').innerText = userData.name;
+                    }
+                }
             } catch (error) {
                 console.error("Error fetching user data:", error);
             }
         });
         
-        // Logout functionality
+        // Logout function
         document.getElementById('logoutBtn').addEventListener('click', async () => {
             console.log("Logging out...");
-            await signOut(auth);
-            window.location.href = 'index.html';
+            try {
+                await signOut(auth);
+                window.location.href = 'index.html';
+            } catch (error) {
+                console.error("Logout error:", error);
+            }
         });
         
-        // SOS Button functionality
+        // SOS functions
         function triggerSOS() {
             if (confirm('🚨 EMERGENCY: This will alert campus security. Continue?')) {
-                alert('SOS triggered! Security has been notified of your location.');
-                // Full SOS implementation will be added later
+                alert('SOS triggered! Security will be notified.');
             }
         }
         
-        document.getElementById('sosBtn')?.addEventListener('click', triggerSOS);
+        document.getElementById('sosCard')?.addEventListener('click', triggerSOS);
         document.getElementById('floatingSosBtn')?.addEventListener('click', triggerSOS);
     </script>
 </body>

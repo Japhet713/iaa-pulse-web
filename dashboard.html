@@ -7,51 +7,29 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            background-color: #f0f2f5;
-        }
+        body { background-color: #f0f2f5; }
         .sos-button {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            z-index: 1000;
-            font-size: 30px;
+            position: fixed; bottom: 20px; right: 20px; width: 70px; height: 70px;
+            border-radius: 50%; background-color: #dc3545; color: white;
+            border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 1000; font-size: 30px;
         }
-        .card-hover {
-            transition: transform 0.2s;
-            cursor: pointer;
-        }
-        .card-hover:hover {
-            transform: translateY(-5px);
-        }
+        .card-hover { transition: transform 0.2s; cursor: pointer; }
+        .card-hover:hover { transform: translateY(-5px); }
     </style>
 </head>
 <body>
     <nav class="navbar navbar-dark bg-primary">
         <div class="container">
-            <span class="navbar-brand">
-                <i class="fas fa-broadcast-tower"></i> IAA Pulse
-            </span>
+            <span class="navbar-brand"><i class="fas fa-broadcast-tower"></i> IAA Pulse</span>
             <div>
                 <span id="userEmailDisplay" class="text-white me-3"></span>
-                <button id="logoutBtn" class="btn btn-outline-light btn-sm">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </button>
+                <button id="logoutBtn" class="btn btn-outline-light btn-sm">Logout</button>
             </div>
         </div>
     </nav>
 
     <div class="container mt-4">
-        <div class="alert alert-success" id="welcomeAlert">
-            Welcome to IAA Pulse!
-        </div>
+        <div class="alert alert-success" id="welcomeAlert">Welcome to IAA Pulse!</div>
 
         <div class="row mt-4">
             <div class="col-md-6 col-lg-3 mb-3">
@@ -63,7 +41,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="col-md-6 col-lg-3 mb-3">
                 <div class="card text-center card-hover" onclick="alert('Lost & Found coming soon')">
                     <div class="card-body">
@@ -73,7 +50,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="col-md-6 col-lg-3 mb-3">
                 <div class="card text-center card-hover" id="sosCard">
                     <div class="card-body">
@@ -83,7 +59,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="col-md-6 col-lg-3 mb-3">
                 <div class="card text-center card-hover" onclick="alert('Anonymous Box coming soon')">
                     <div class="card-body">
@@ -96,19 +71,15 @@
         </div>
     </div>
 
-    <button class="sos-button" id="floatingSosBtn">
-        <i class="fas fa-exclamation-triangle"></i>
-    </button>
+    <button class="sos-button" id="floatingSosBtn"><i class="fas fa-exclamation-triangle"></i></button>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script type="module">
-        // ALL IMPORTS IN ONE BLOCK
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
-        import { getAuth, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
-        import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+        import { getAuth, signOut } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
         
-        // REPLACE WITH YOUR FIREBASE CONFIG
+        // YOUR FIREBASE CONFIG - SAME AS INDEX.HTML
         const firebaseConfig = {
             apiKey: "YOUR_API_KEY",
             authDomain: "YOUR_AUTH_DOMAIN",
@@ -118,59 +89,39 @@
             appId: "YOUR_APP_ID"
         };
         
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app);
         
-        // Check auth state ONCE when page loads
-        let authChecked = false;
+        // CHECK MANUAL SESSION STORAGE FIRST
+        const isLoggedIn = sessionStorage.getItem('iaa_user_logged_in');
+        const userEmail = sessionStorage.getItem('iaa_user_email');
         
-        onAuthStateChanged(auth, async (user) => {
-            console.log("Auth state changed. User:", user ? user.email : "null");
-            
-            if (!user) {
-                // No user - redirect to login
-                console.log("No user, redirecting to login");
-                window.location.href = 'index.html';
-                return;
-            }
-            
-            // User is logged in - show dashboard
-            console.log("User logged in:", user.email);
-            document.getElementById('userEmailDisplay').innerText = user.email;
-            document.getElementById('welcomeAlert').innerHTML = `Welcome ${user.email}! You are logged in to IAA Pulse.`;
-            
-            // Try to get user name from Firestore (optional)
-            try {
-                const userDoc = await getDoc(doc(db, 'users', user.uid));
-                if (userDoc.exists()) {
-                    const userData = userDoc.data();
-                    if (userData.name) {
-                        document.getElementById('welcomeAlert').innerHTML = `Welcome ${userData.name}! You are logged in to IAA Pulse.`;
-                        document.getElementById('userEmailDisplay').innerText = userData.name;
-                    }
-                }
-            } catch (error) {
-                console.error("Error fetching user data:", error);
-            }
-        });
+        if (!isLoggedIn || isLoggedIn !== 'true') {
+            console.log("No session found, redirecting to login");
+            window.location.href = 'index.html';
+        } else {
+            // Display user info
+            document.getElementById('userEmailDisplay').innerText = userEmail;
+            document.getElementById('welcomeAlert').innerHTML = `Welcome ${userEmail}! You are logged in to IAA Pulse.`;
+            console.log("Dashboard loaded - user is logged in:", userEmail);
+        }
         
-        // Logout function
+        // Logout - clear both Firebase and manual session
         document.getElementById('logoutBtn').addEventListener('click', async () => {
-            console.log("Logging out...");
             try {
                 await signOut(auth);
-                window.location.href = 'index.html';
-            } catch (error) {
-                console.error("Logout error:", error);
-            }
+            } catch(e) { console.log("Sign out error:", e); }
+            
+            sessionStorage.removeItem('iaa_user_logged_in');
+            sessionStorage.removeItem('iaa_user_email');
+            sessionStorage.removeItem('iaa_user_uid');
+            window.location.href = 'index.html';
         });
         
         // SOS functions
         function triggerSOS() {
-            if (confirm('🚨 EMERGENCY: This will alert campus security. Continue?')) {
-                alert('SOS triggered! Security will be notified.');
+            if (confirm('🚨 EMERGENCY: Alert campus security?')) {
+                alert('SOS triggered! Security notified.');
             }
         }
         

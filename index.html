@@ -2,31 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>IAA Pulse - Campus Safety & Information</title>
-    
-    <!-- Bootstrap 5 CSS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IAA Pulse - Campus Safety</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Custom CSS -->
     <style>
-        body {
-            background-color: #f0f2f5;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        .card {
-            border-radius: 15px;
-        }
-        .btn-primary {
-            background-color: #0d6efd;
-            border: none;
-        }
-        .btn-primary:hover {
-            background-color: #0b5ed7;
-        }
+        body { background-color: #f0f2f5; font-family: 'Segoe UI', sans-serif; }
+        .card { border-radius: 15px; }
+        .btn-primary { background-color: #0d6efd; border: none; }
+        .btn-primary:hover { background-color: #0b5ed7; }
     </style>
 </head>
 <body>
@@ -43,19 +27,15 @@
                         
                         <form id="loginForm">
                             <div class="mb-3">
-                                <label for="email" class="form-label">Email Address</label>
+                                <label class="form-label">Email Address</label>
                                 <input type="email" class="form-control" id="email" required>
                             </div>
                             <div class="mb-3">
-                                <label for="password" class="form-label">Password</label>
+                                <label class="form-label">Password</label>
                                 <input type="password" class="form-control" id="password" required>
                             </div>
                             <button type="submit" class="btn btn-primary w-100">Login</button>
                         </form>
-                        
-                        <div class="text-center mt-3">
-                            <a href="#" id="forgotPassword">Forgot Password?</a>
-                        </div>
                         
                         <div id="errorMessage" class="alert alert-danger mt-3 d-none"></div>
                     </div>
@@ -64,87 +44,58 @@
         </div>
     </div>
 
-    <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Firebase SDKs - ALL IMPORTS IN ONE PLACE -->
+
     <script type="module">
-        // Import all Firebase services in one block
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
         import { getAuth, signInWithEmailAndPassword, setPersistence, browserLocalPersistence } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
         
-        // REPLACE WITH YOUR ACTUAL FIREBASE CONFIGURATION
-    const firebaseConfig = {
-  apiKey: "AIzaSyCUYeXvkrrIpAOgCrRr7YUXKrrAo0CR-YE",
-  authDomain: "iaa-pulse-web.firebaseapp.com",
-  projectId: "iaa-pulse-web",
-  storageBucket: "iaa-pulse-web.firebasestorage.app",
-  messagingSenderId: "383584068249",
-  appId: "1:383584068249:web:70a18a9c8c8f6a77878e08"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+        // YOUR FIREBASE CONFIG - REPLACE THIS
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+        
+        const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         
-        // Get DOM elements
         const loginForm = document.getElementById('loginForm');
         const emailInput = document.getElementById('email');
         const passwordInput = document.getElementById('password');
         const errorDiv = document.getElementById('errorMessage');
         
-        // Handle login
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const email = emailInput.value.trim();
             const password = passwordInput.value;
             
-            // Hide previous error
             errorDiv.classList.add('d-none');
             
             try {
-                // Set persistence to keep user logged in
+                // Set persistence
                 await setPersistence(auth, browserLocalPersistence);
                 
-                // Sign in
+                // Login
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                console.log("Login successful:", userCredential.user.email);
                 
-                // Redirect to dashboard
-               window.location.href = 'dashboard.html';
+                // MANUAL PERSISTENCE - Store user info in sessionStorage
+                sessionStorage.setItem('iaa_user_logged_in', 'true');
+                sessionStorage.setItem('iaa_user_email', userCredential.user.email);
+                sessionStorage.setItem('iaa_user_uid', userCredential.user.uid);
+                
+                console.log("Login successful, redirecting...");
+                window.location.href = 'dashboard.html';
                 
             } catch (error) {
-                console.error("Login error:", error.code, error.message);
-                
-                // Show user-friendly error message
-                let userMessage = "Login failed. Please try again.";
-                if (error.code === 'auth/user-not-found') {
-                    userMessage = "No account found with this email.";
-                } else if (error.code === 'auth/wrong-password') {
-                    userMessage = "Incorrect password. Please try again.";
-                } else if (error.code === 'auth/invalid-email') {
-                    userMessage = "Please enter a valid email address.";
-                }
-                
-                errorDiv.textContent = userMessage;
+                console.error("Login error:", error.message);
+                errorDiv.textContent = "Login failed: " + error.message;
                 errorDiv.classList.remove('d-none');
             }
-        });
-        
-        // Forgot password handler
-        document.getElementById('forgotPassword').addEventListener('click', async (e) => {
-            e.preventDefault();
-            const email = emailInput.value.trim();
-            
-            if (!email) {
-                errorDiv.textContent = "Please enter your email address first.";
-                errorDiv.classList.remove('d-none');
-                return;
-            }
-            
-            // Note: Password reset requires additional Firebase setup
-            alert("Password reset will be available soon. Please contact the IT department.");
         });
     </script>
 </body>

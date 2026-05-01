@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Dashboard - IAA Pulse</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-broadcast-tower"></i> IAA Pulse
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="navProfile">
+                            <i class="fas fa-user-circle"></i> <span id="userName">Loading...</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <button class="btn btn-outline-light ms-2" id="logoutBtn">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <!-- Welcome Section -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i> Welcome to IAA Pulse!
+                    <span id="roleBadge" class="badge bg-info float-end">Student</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Role-Based Dashboard Content -->
+        <div id="studentDashboard" class="dashboard-section">
+            <div class="row">
+                <div class="col-md-6 col-lg-3 mb-3">
+                    <div class="card text-center card-hover">
+                        <div class="card-body">
+                            <i class="fas fa-bullhorn fa-3x text-primary mb-2"></i>
+                            <h5 class="card-title">Announcements</h5>
+                            <p class="card-text">View official campus announcements</p>
+                            <a href="pages/student/announcements.html" class="btn btn-primary btn-sm">View</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3 mb-3">
+                    <div class="card text-center card-hover">
+                        <div class="card-body">
+                            <i class="fas fa-search fa-3x text-warning mb-2"></i>
+                            <h5 class="card-title">Lost & Found</h5>
+                            <p class="card-text">Report lost items or browse found items</p>
+                            <a href="pages/student/lost_found.html" class="btn btn-warning btn-sm">Browse</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3 mb-3">
+                    <div class="card text-center card-hover">
+                        <div class="card-body">
+                            <i class="fas fa-exclamation-triangle fa-3x text-danger mb-2"></i>
+                            <h5 class="card-title">SOS Emergency</h5>
+                            <p class="card-text">Send alert to campus security</p>
+                            <button class="btn btn-danger btn-sm" id="sosBtn">Trigger SOS</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3 mb-3">
+                    <div class="card text-center card-hover">
+                        <div class="card-body">
+                            <i class="fas fa-inbox fa-3x text-success mb-2"></i>
+                            <h5 class="card-title">Anonymous Box</h5>
+                            <p class="card-text">Report issues anonymously</p>
+                            <a href="pages/student/anonymous.html" class="btn btn-success btn-sm">Submit</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="registrarDashboard" class="dashboard-section" style="display: none;">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-plus-circle fa-3x text-primary"></i>
+                            <h5>Post Announcement</h5>
+                            <a href="pages/registrar/create_announcement.html" class="btn btn-primary">Create</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-chart-line fa-3x text-success"></i>
+                            <h5>Read Receipts</h5>
+                            <a href="pages/registrar/read_receipts.html" class="btn btn-success">View</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating SOS Button (visible on all pages) -->
+    <button class="sos-button" id="floatingSosBtn">
+        <i class="fas fa-exclamation-triangle"></i>
+    </button>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+        import { getAuth, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+        import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+        
+        // Your Firebase Configuration (REPLACE WITH YOUR ACTUAL CONFIG)
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+        
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        // Check authentication state
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                // No user logged in - redirect to login
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // Get user role from Firestore
+            const userDoc = await getDoc(doc(db, 'users', user.uid));
+            const userData = userDoc.data();
+            const role = userData?.role || 'student';
+            
+            // Display user name
+            document.getElementById('userName').textContent = userData?.name || user.email;
+            document.getElementById('roleBadge').textContent = role.toUpperCase();
+            
+            // Show appropriate dashboard based on role
+            if (role === 'registrar') {
+                document.getElementById('studentDashboard').style.display = 'none';
+                document.getElementById('registrarDashboard').style.display = 'block';
+            } else {
+                document.getElementById('studentDashboard').style.display = 'block';
+                document.getElementById('registrarDashboard').style.display = 'none';
+            }
+        });
+        
+        // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            await signOut(auth);
+            window.location.href = 'index.html';
+        });
+        
+        // SOS Button functionality
+        function triggerSOS() {
+            if (confirm('🚨 EMERGENCY: This will alert campus security. Continue?')) {
+                alert('SOS triggered! Security has been notified of your location.');
+                // Full SOS implementation will be added later
+            }
+        }
+        
+        document.getElementById('sosBtn')?.addEventListener('click', triggerSOS);
+        document.getElementById('floatingSosBtn')?.addEventListener('click', triggerSOS);
+    </script>
+</body>
+</html>

@@ -53,7 +53,7 @@
             </div>
         </div>
 
-        <!-- Role-Based Dashboard Content -->
+        <!-- Student Dashboard -->
         <div id="studentDashboard" class="dashboard-section">
             <div class="row">
                 <div class="col-md-6 col-lg-3 mb-3">
@@ -98,32 +98,9 @@
                 </div>
             </div>
         </div>
-
-        <div id="registrarDashboard" class="dashboard-section" style="display: none;">
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <i class="fas fa-plus-circle fa-3x text-primary"></i>
-                            <h5>Post Announcement</h5>
-                            <a href="pages/registrar/create_announcement.html" class="btn btn-primary">Create</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <i class="fas fa-chart-line fa-3x text-success"></i>
-                            <h5>Read Receipts</h5>
-                            <a href="pages/registrar/read_receipts.html" class="btn btn-success">View</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
-    <!-- Floating SOS Button (visible on all pages) -->
+    <!-- Floating SOS Button -->
     <button class="sos-button" id="floatingSosBtn">
         <i class="fas fa-exclamation-triangle"></i>
     </button>
@@ -152,35 +129,37 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         
-        // Check authentication state
+        // FIXED: Check authentication state with persistence
         onAuthStateChanged(auth, async (user) => {
+            console.log("Auth state changed. User:", user);
+            
             if (!user) {
-                // No user logged in - redirect to login
+                console.log("No user found - redirecting to login");
                 window.location.href = 'index.html';
                 return;
             }
             
-            // Get user role from Firestore
-            const userDoc = await getDoc(doc(db, 'users', user.uid));
-            const userData = userDoc.data();
-            const role = userData?.role || 'student';
+            console.log("User is logged in:", user.email);
             
-            // Display user name
-            document.getElementById('userName').textContent = userData?.name || user.email;
-            document.getElementById('roleBadge').textContent = role.toUpperCase();
-            
-            // Show appropriate dashboard based on role
-            if (role === 'registrar') {
-                document.getElementById('studentDashboard').style.display = 'none';
-                document.getElementById('registrarDashboard').style.display = 'block';
-            } else {
-                document.getElementById('studentDashboard').style.display = 'block';
-                document.getElementById('registrarDashboard').style.display = 'none';
+            try {
+                // Get user role from Firestore
+                const userDoc = await getDoc(doc(db, 'users', user.uid));
+                const userData = userDoc.data();
+                const role = userData?.role || 'student';
+                
+                // Display user name
+                document.getElementById('userName').textContent = userData?.name || user.email;
+                document.getElementById('roleBadge').textContent = role.toUpperCase();
+                
+                console.log("User role:", role);
+            } catch (error) {
+                console.error("Error fetching user data:", error);
             }
         });
         
         // Logout functionality
         document.getElementById('logoutBtn').addEventListener('click', async () => {
+            console.log("Logging out...");
             await signOut(auth);
             window.location.href = 'index.html';
         });
